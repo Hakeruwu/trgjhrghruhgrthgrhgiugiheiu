@@ -1,0 +1,980 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON ARCADE - Play Games</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --red: #ff303f;
+    --dark: #09090d;
+    --panel: #14141c;
+    --text: #ffffff;
+    --muted: #9999a8;
+}
+
+body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+header {
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7%;
+    background: rgba(15,15,22,.95);
+    border-bottom: 1px solid #29202a;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(15px);
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.logo span {
+    color: var(--red);
+}
+
+nav {
+    display: flex;
+    gap: 25px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #aaa;
+    transition: .2s;
+}
+
+nav a:hover {
+    color: var(--red);
+}
+
+.hero {
+    text-align: center;
+    padding: 85px 20px 65px;
+    background:
+        radial-gradient(ellipse at 50% 0%, #59101855, transparent 65%);
+}
+
+.hero h1 {
+    font-size: clamp(38px, 7vw, 76px);
+    font-weight: 900;
+    letter-spacing: 3px;
+    animation: appear .8s ease;
+}
+
+.hero h1 span {
+    color: var(--red);
+    text-shadow: 0 0 30px #ff303f66;
+}
+
+.hero p {
+    color: var(--muted);
+    margin: 18px 0 28px;
+    font-size: 17px;
+}
+
+.hero button {
+    padding: 15px 35px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.hero button:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 25px #ff303f77;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 45px;
+    margin-top: 40px;
+}
+
+.stat strong {
+    font-size: 25px;
+    display: block;
+}
+
+.stat small {
+    color: var(--muted);
+}
+
+main {
+    max-width: 1250px;
+    margin: auto;
+    padding: 25px 25px 70px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.section-heading h2 {
+    font-size: 27px;
+}
+
+.section-heading h2 span {
+    color: var(--red);
+}
+
+.search {
+    background: var(--panel);
+    color: white;
+    border: 1px solid #30303b;
+    padding: 12px 16px;
+    border-radius: 8px;
+    outline: none;
+    width: 230px;
+}
+
+.search:focus {
+    border-color: var(--red);
+}
+
+.categories {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.category {
+    background: #191922;
+    border: 1px solid #30303b;
+    color: #aaa;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.category:hover,
+.category.active {
+    background: var(--red);
+    border-color: var(--red);
+    color: white;
+}
+
+.games {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+    gap: 22px;
+}
+
+.game-card {
+    background: var(--panel);
+    border: 1px solid #292933;
+    border-radius: 13px;
+    overflow: hidden;
+    transition: .3s;
+    animation: appear .5s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-7px);
+    border-color: var(--red);
+    box-shadow: 0 10px 35px #ff303f18;
+}
+
+.game-image {
+    height: 155px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 65px;
+    background: linear-gradient(135deg, #261018, #151521);
+}
+
+.game-info {
+    padding: 18px;
+}
+
+.game-info h3 {
+    margin-bottom: 8px;
+}
+
+.game-info p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+.play-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 7px;
+    background: #252530;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.play-btn:hover {
+    background: var(--red);
+}
+
+.no-games {
+    grid-column: 1 / -1;
+    color: var(--muted);
+    text-align: center;
+    padding: 40px;
+}
+
+footer {
+    padding: 30px;
+    border-top: 1px solid #29202a;
+    text-align: center;
+    color: #777;
+}
+
+/* GAME WINDOW */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: #000000eF;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.modal.open {
+    display: flex;
+    animation: appear .2s ease;
+}
+
+.modal-content {
+    background: #15151e;
+    border: 1px solid #5b2028;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 550px;
+    padding: 25px;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 0 50px #ff303f22;
+}
+
+.close {
+    position: absolute;
+    top: 13px;
+    right: 17px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+#gameTitle {
+    margin: 10px 0 25px;
+    color: var(--red);
+}
+
+.game-area {
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+}
+
+.game-area button {
+    padding: 13px 25px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.game-area button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.game-score {
+    font-size: 35px;
+    font-weight: bold;
+}
+
+.big-target {
+    font-size: 65px;
+    border: none;
+    background: none !important;
+    cursor: pointer;
+}
+
+.big-target:hover {
+    transform: scale(1.15);
+}
+
+#reactionBox {
+    width: 100%;
+    height: 150px;
+    border-radius: 10px;
+    background: #8c222d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+}
+
+#guessInput {
+    width: 110px;
+    padding: 12px;
+    background: #242430;
+    border: 1px solid #555;
+    border-radius: 7px;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media(max-width:600px) {
+    header {
+        padding: 0 5%;
+    }
+
+    nav {
+        gap: 12px;
+        font-size: 12px;
+    }
+
+    .logo {
+        font-size: 19px;
+    }
+
+    .hero {
+        padding-top: 60px;
+    }
+
+    .stats {
+        gap: 20px;
+    }
+
+    .section-heading {
+        align-items: stretch;
+    }
+
+    .search {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">NEON<span>ARCADE</span></div>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#games">Games</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>PLAY <span>WITHOUT LIMITS</span></h1>
+    <p>Discover games. Beat records. Have fun.</p>
+
+    <button onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})">
+        EXPLORE GAMES
+    </button>
+
+    <div class="stats">
+        <div class="stat">
+            <strong id="gameCount">6</strong>
+            <small>Games</small>
+        </div>
+        <div class="stat">
+            <strong>FREE</strong>
+            <small>To Play</small>
+        </div>
+        <div class="stat">
+            <strong>24/7</strong>
+            <small>Available</small>
+        </div>
+    </div>
+</section>
+
+<main id="games">
+
+    <div class="section-heading">
+        <h2>GAME <span>LIBRARY</span></h2>
+        <input
+            class="search"
+            id="search"
+            type="text"
+            placeholder="Search games..."
+            oninput="renderGames()"
+        >
+    </div>
+
+    <div class="categories">
+        <button class="category active" onclick="filterGames('All',this)">All</button>
+        <button class="category" onclick="filterGames('Arcade',this)">Arcade</button>
+        <button class="category" onclick="filterGames('Skill',this)">Skill</button>
+        <button class="category" onclick="filterGames('Puzzle',this)">Puzzle</button>
+    </div>
+
+    <div class="games" id="gamesGrid"></div>
+
+</main>
+
+<footer>
+    NEON ARCADE © 2026 — PLAY YOUR WAY.
+</footer>
+
+<!-- GAME MODAL -->
+
+<div class="modal" id="gameModal">
+    <div class="modal-content">
+        <button class="close" onclick="closeGame()">×</button>
+        <h2 id="gameTitle">GAME</h2>
+        <div class="game-area" id="gameArea"></div>
+    </div>
+</div>
+
+<script>
+
+const games = [
+    {
+        id: "clicker",
+        name: "Neon Clicker",
+        description: "Click as fast as you can!",
+        category: "Arcade",
+        icon: "💎"
+    },
+    {
+        id: "reaction",
+        name: "Reflex Rush",
+        description: "Test your reaction speed.",
+        category: "Skill",
+        icon: "⚡"
+    },
+    {
+        id: "guess",
+        name: "Number Hacker",
+        description: "Guess the secret number.",
+        category: "Puzzle",
+        icon: "🔢"
+    },
+    {
+        id: "memory",
+        name: "Memory Test",
+        description: "Remember the flashing sequence.",
+        category: "Puzzle",
+        icon: "🧠"
+    },
+    {
+        id: "target",
+        name: "Target Smash",
+        description: "Hit the moving target.",
+        category: "Skill",
+        icon: "🎯"
+    },
+    {
+        id: "math",
+        name: "Quick Math",
+        description: "Solve equations against the clock.",
+        category: "Puzzle",
+        icon: "➗"
+    }
+];
+
+let currentCategory = "All";
+let score = 0;
+let timer = null;
+let gameData = {};
+
+function renderGames() {
+
+    const search = document
+        .getElementById("search")
+        .value.toLowerCase();
+
+    const filtered = games.filter(game => {
+        return (
+            (currentCategory === "All" ||
+            game.category === currentCategory) &&
+            game.name.toLowerCase().includes(search)
+        );
+    });
+
+    document.getElementById("gameCount").textContent = games.length;
+
+    const grid = document.getElementById("gamesGrid");
+
+    if (!filtered.length) {
+        grid.innerHTML = '<div class="no-games">No games found.</div>';
+        return;
+    }
+
+    grid.innerHTML = filtered.map(game => `
+        <div class="game-card">
+            <div class="game-image">${game.icon}</div>
+            <div class="game-info">
+                <h3>${game.name}</h3>
+                <p>${game.description}</p>
+                <button class="play-btn"
+                    onclick="openGame('${game.id}')">
+                    PLAY NOW →
+                </button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function filterGames(category, button) {
+    currentCategory = category;
+
+    document.querySelectorAll(".category").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+    renderGames();
+}
+
+function openGame(id) {
+
+    clearInterval(timer);
+    gameData = {};
+
+    const game = games.find(g => g.id === id);
+
+    document.getElementById("gameTitle").textContent = game.name;
+    document.getElementById("gameModal").classList.add("open");
+
+    const area = document.getElementById("gameArea");
+
+    if (id === "clicker") startClicker(area);
+    if (id === "reaction") startReaction(area);
+    if (id === "guess") startGuess(area);
+    if (id === "memory") startMemory(area);
+    if (id === "target") startTarget(area);
+    if (id === "math") startMath(area);
+}
+
+function closeGame() {
+    clearInterval(timer);
+    document.getElementById("gameModal").classList.remove("open");
+}
+
+document.getElementById("gameModal").addEventListener("click", e => {
+    if (e.target.id === "gameModal") closeGame();
+});
+
+function startClicker(area) {
+
+    score = 0;
+    let time = 10;
+
+    area.innerHTML = `
+        <div>Time left: <strong id="time">${time}</strong>s</div>
+        <div class="game-score" id="score">0</div>
+        <button class="big-target" id="clickTarget">💎</button>
+        <p>Click the diamond as fast as possible!</p>
+        <button id="startClicker">START GAME</button>
+    `;
+
+    const target = document.getElementById("clickTarget");
+    target.disabled = true;
+
+    document.getElementById("startClicker").onclick = () => {
+
+        score = 0;
+        time = 10;
+
+        target.disabled = false;
+        document.getElementById("startClicker").disabled = true;
+
+        timer = setInterval(() => {
+            time--;
+            document.getElementById("time").textContent = time;
+
+            if (time <= 0) {
+                clearInterval(timer);
+                target.disabled = true;
+                document.getElementById("startClicker").disabled = false;
+                document.getElementById("startClicker").textContent = "PLAY AGAIN";
+            }
+        }, 1000);
+    };
+
+    target.onclick = () => {
+        score++;
+        document.getElementById("score").textContent = score;
+    };
+}
+
+function startReaction(area) {
+
+    area.innerHTML = `
+        <p>Wait until the box turns GREEN, then click it!</p>
+        <div id="reactionBox">PRESS START</div>
+        <div id="reactionResult">Your reaction time will appear here.</div>
+        <button id="reactionStart">START</button>
+    `;
+
+    let ready = false;
+    let startTime = 0;
+
+    const box = document.getElementById("reactionBox");
+
+    document.getElementById("reactionStart").onclick = () => {
+
+        clearTimeout(gameData.timeout);
+        ready = false;
+
+        box.style.background = "#8c222d";
+        box.textContent = "WAIT...";
+
+        document.getElementById("reactionResult").textContent = "";
+
+        document.getElementById("reactionStart").disabled = true;
+
+        gameData.timeout = setTimeout(() => {
+            ready = true;
+            startTime = performance.now();
+            box.style.background = "#168c48";
+            box.textContent = "CLICK NOW!";
+        }, 1500 + Math.random() * 3000);
+    };
+
+    box.onclick = () => {
+        if (ready) {
+            const result = Math.round(performance.now() - startTime);
+
+            document.getElementById("reactionResult").textContent =
+                "Your time: " + result + " ms";
+
+            ready = false;
+            box.textContent = "NICE!";
+            document.getElementById("reactionStart").disabled = false;
+
+        } else if (document.getElementById("reactionStart").disabled) {
+            clearTimeout(gameData.timeout);
+
+            box.textContent = "TOO EARLY!";
+            document.getElementById("reactionResult").textContent =
+                "Wait for green next time.";
+
+            document.getElementById("reactionStart").disabled = false;
+        }
+    };
+}
+
+function startGuess(area) {
+
+    let secret = Math.floor(Math.random() * 100) + 1;
+    let attempts = 0;
+
+    area.innerHTML = `
+        <p>Guess a number between 1 and 100.</p>
+        <input id="guessInput" type="number" min="1" max="100">
+        <button id="guessButton">GUESS</button>
+        <div id="guessResult">Good luck!</div>
+        <div id="guessAttempts">Attempts: 0</div>
+    `;
+
+    function checkGuess() {
+        const input = document.getElementById("guessInput");
+        const value = Number(input.value);
+
+        if (!input.value || value < 1 || value > 100) {
+            document.getElementById("guessResult").textContent =
+                "Enter a number between 1 and 100.";
+            return;
+        }
+
+        attempts++;
+
+        if (value === secret) {
+            document.getElementById("guessResult").textContent =
+                "CORRECT! YOU WON! 🎉";
+            document.getElementById("guessButton").disabled = true;
+        } else {
+            document.getElementById("guessResult").textContent =
+                value > secret ? "Too high! ⬇️" : "Too low! ⬆️";
+        }
+
+        document.getElementById("guessAttempts").textContent =
+            "Attempts: " + attempts;
+    }
+
+    document.getElementById("guessButton").onclick = checkGuess;
+
+    document.getElementById("guessInput").onkeydown = e => {
+        if (e.key === "Enter") checkGuess();
+    };
+}
+
+function startMemory(area) {
+
+    let sequence = [];
+    let level = 1;
+    let inputIndex = 0;
+    let locked = true;
+
+    area.innerHTML = `
+        <div class="game-score" id="memoryLevel">LEVEL 1</div>
+        <p id="memoryMessage">Watch the sequence!</p>
+        <div id="memoryButtons" style="display:grid;grid-template-columns:repeat(2,100px);gap:10px">
+            <button data-color="0" style="background:#e33">RED</button>
+            <button data-color="1" style="background:#27a85d">GREEN</button>
+            <button data-color="2" style="background:#2778dd">BLUE</button>
+            <button data-color="3" style="background:#e6ae20">YELLOW</button>
+        </div>
+        <button id="memoryStart">START</button>
+    `;
+
+    const buttons = [...document.querySelectorAll("[data-color]")];
+
+    function nextLevel() {
+        sequence.push(Math.floor(Math.random() * 4));
+        inputIndex = 0;
+        locked = true;
+
+        document.getElementById("memoryLevel").textContent =
+            "LEVEL " + level;
+
+        document.getElementById("memoryMessage").textContent =
+            "Watch carefully!";
+
+        let i = 0;
+
+        function flash() {
+            if (i >= sequence.length) {
+                locked = false;
+                document.getElementById("memoryMessage").textContent =
+                    "Repeat the sequence!";
+                return;
+            }
+
+            buttons[sequence[i]].style.opacity = ".4";
+
+            setTimeout(() => {
+                buttons[sequence[i]].style.opacity = "1";
+                i++;
+                setTimeout(flash, 350);
+            }, 450);
+        }
+
+        setTimeout(flash, 300);
+    }
+
+    document.getElementById("memoryStart").onclick = () => {
+        sequence = [];
+        level = 1;
+        nextLevel();
+    };
+
+    buttons.forEach(button => {
+        button.onclick = () => {
+            if (locked || !sequence.length) return;
+
+            if (Number(button.dataset.color) !== sequence[inputIndex]) {
+                locked = true;
+                document.getElementById("memoryMessage").textContent =
+                    "Game over! You reached level " + level;
+                return;
+            }
+
+            inputIndex++;
+
+            if (inputIndex === sequence.length) {
+                level++;
+                locked = true;
+                setTimeout(nextLevel, 700);
+            }
+        };
+    });
+}
+
+function startTarget(area) {
+
+    let hits = 0;
+    let time = 15;
+
+    area.innerHTML = `
+        <p>Hit the target before time runs out!</p>
+        <div>Time: <strong id="targetTime">15</strong>s</div>
+        <div class="game-score" id="targetScore">0</div>
+        <div id="targetArea" style="height:160px;width:100%;position:relative;background:#222230;border-radius:10px;overflow:hidden">
+            <button id="targetButton" style="position:absolute;left:40%;top:40%;border-radius:50%;padding:13px">🎯</button>
+        </div>
+        <button id="targetStart">START</button>
+    `;
+
+    const target = document.getElementById("targetButton");
+    target.disabled = true;
+
+    function moveTarget() {
+        const container = document.getElementById("targetArea");
+        target.style.left = Math.random() * (container.clientWidth - 55) + "px";
+        target.style.top = Math.random() * 105 + "px";
+    }
+
+    document.getElementById("targetStart").onclick = () => {
+        hits = 0;
+        time = 15;
+        target.disabled = false;
+        document.getElementById("targetStart").disabled = true;
+
+        timer = setInterval(() => {
+            time--;
+            document.getElementById("targetTime").textContent = time;
+
+            if (time <= 0) {
+                clearInterval(timer);
+                target.disabled = true;
+                document.getElementById("targetStart").disabled = false;
+                document.getElementById("targetStart").textContent = "PLAY AGAIN";
+            }
+        }, 1000);
+    };
+
+    target.onclick = () => {
+        hits++;
+        document.getElementById("targetScore").textContent = hits;
+        moveTarget();
+    };
+}
+
+function startMath(area) {
+
+    let answer = 0;
+    let score = 0;
+    let time = 30;
+
+    area.innerHTML = `
+        <div>Time: <strong id="mathTime">30</strong>s</div>
+        <div class="game-score" id="mathScore">0</div>
+        <h2 id="mathQuestion">Press start!</h2>
+        <input id="mathInput" type="number" placeholder="Answer">
+        <button id="mathSubmit">SUBMIT</button>
+        <button id="mathStart">START</button>
+        <p id="mathMessage"></p>
+    `;
+
+    const submit = document.getElementById("mathSubmit");
+    submit.disabled = true;
+
+    function newQuestion() {
+        const a = Math.floor(Math.random() * 12) + 1;
+        const b = Math.floor(Math.random() * 12) + 1;
+
+        answer = a + b;
+
+        document.getElementById("mathQuestion").textContent =
+            a + " + " + b + " = ?";
+    }
+
+    document.getElementById("mathStart").onclick = () => {
+        score = 0;
+        time = 30;
+        submit.disabled = false;
+        document.getElementById("mathStart").disabled = true;
+        document.getElementById("mathMessage").textContent = "";
+
+        newQuestion();
+
+        timer = setInterval(() => {
+            time--;
+            document.getElementById("mathTime").textContent = time;
+
+            if (time <= 0) {
+                clearInterval(timer);
+                submit.disabled = true;
+                document.getElementById("mathStart").disabled = false;
+                document.getElementById("mathStart").textContent = "PLAY AGAIN";
+                document.getElementById("mathMessage").textContent =
+                    "Game over! Final score: " + score;
+            }
+        }, 1000);
+    };
+
+    function checkAnswer() {
+        const input = document.getElementById("mathInput");
+
+        if (!input.value || submit.disabled) return;
+
+        if (Number(input.value) === answer) {
+            score++;
+            document.getElementById("mathScore").textContent = score;
+            document.getElementById("mathMessage").textContent = "Correct!";
+        } else {
+            document.getElementById("mathMessage").textContent = "Try again!";
+        }
+
+        input.value = "";
+        newQuestion();
+    }
+
+    submit.onclick = checkAnswer;
+
+    document.getElementById("mathInput").onkeydown = e => {
+        if (e.key === "Enter") checkAnswer();
+    };
+}
+
+renderGames();
+
+</script>
+
+</body>
+</html>
